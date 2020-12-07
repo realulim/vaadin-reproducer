@@ -1,0 +1,16 @@
+.env
+.gradle
+.idea
+*.iml
+build
+.nb-gradle-properties
+.nb-gradle
+nbproject
+*.DS_Store
+node
+node_modules
+target
+package.json
+package-lock.json
+webpack.config.js
+webpack.generated.js

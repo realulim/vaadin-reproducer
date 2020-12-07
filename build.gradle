@@ -1,0 +1,17 @@
+plugins {
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+}
+
+wrapper {
+    description = "Generates gradlew[.bat] scripts"
+    gradleVersion = "6.5"
+    distributionType = "all"
+}

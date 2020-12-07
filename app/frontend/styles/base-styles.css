@@ -1,0 +1,20 @@
+html {
+    --lumo-border-radius: 5px !important;
+    --app-layout-app-bar-large-object-display: flex;
+}
+.base-logo {
+    height: 48px;
+}
+.base-logo-link {
+    display: flex;
+    outline: none;
+    margin-left: 1em;
+}
+.logout {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+}
+.gutter {
+    flex: 1;
+}

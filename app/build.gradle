@@ -1,0 +1,107 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.3.6.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'io.franzbecker.gradle-lombok' version '3.2.0'
+    id 'com.vaadin' version '0.7.0'
+}
+
+bootJar {
+    archiveFileName = 'reproducer-app.jar'
+    archiveVersion = '0.1.0'
+    from('src/main/webapp') {
+        into 'META-INF/resources'
+    }
+}
+
+repositories {
+    maven { url "https://maven.vaadin.com/vaadin-addons" }
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+configurations {
+    provided
+    compile.exclude module: 'spring-boot-starter-tomcat' // we are using undertow as webserver
+    compile.exclude group: 'org.slf4j', module: 'slf4j-simple'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'com.vaadin:vaadin-bom:14.4.4'
+    }
+}
+
+lombok {
+    version = "1.18.10"
+    sha256 = ""
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-undertow'
+
+    implementation 'com.vaadin:vaadin-spring-boot-starter'
+    implementation 'com.github.appreciated:app-layout-addon:4.0.0'
+    implementation 'org.vaadin.artur:avataaar:1.0.0'
+    implementation 'org.ilay:ilay:3.0-Final'
+
+    compileOnly 'org.projectlombok:lombok'
+
+    testImplementation 'junit:junit'
+    testImplementation 'com.codeborne:selenide:5.15.0'
+    testImplementation 'org.seleniumhq.selenium:selenium-api:3.141.59'
+    testImplementation 'com.aventstack:extentreports:3.1.5'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+    uiTest {
+        java {
+            srcDir 'src/uiTest/java'
+        }
+        resources {
+            srcDir 'src/uiTest/resources'
+        }
+        compileClasspath += sourceSets.test.compileClasspath
+        runtimeClasspath += sourceSets.test.runtimeClasspath
+    }
+}
+
+tasks.withType(JavaExec) {
+    if (project.hasProperty("devtools")) {
+        systemProperty "spring.devtools.restart.enabled", devtools
+    }
+}
+
+bootRun {
+    environment SPRING_PROFILES_ACTIVE: project.hasProperty('profiles') ? profiles : 'dev'
+    if (project.hasProperty('spring.profiles.active')) {
+        systemProperties['spring.profiles.active']=project.getProperty('spring.profiles.active')
+    }
+}
+
+task uiTest(type: Test) {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    description = 'Runs the UI Tests.'
+    testClassesDirs = sourceSets.uiTest.output.classesDirs
+    classpath = sourceSets.uiTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+    options {
+        systemProperties(System.getProperties().subMap(
+                ['REPORT.UITEST.DIR', 'BASE.URL', 'UITEST.BROWSER', 'UITEST.BROWSER.HEADLESS']
+            )
+        )
+    }
+}

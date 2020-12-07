@@ -1,0 +1,9 @@
+[part="brand"] {
+    min-height: inherit;
+}
+[part="description"] {
+    color: white;
+    font-size: var(--lumo-font-size-xl);
+    font-weight: bold;
+    margin-top: 1em;
+}
